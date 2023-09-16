@@ -1,11 +1,15 @@
 import React from "react";
 
-function TableRow({ participant }) {
+function TableRow({ participant, maxCourseComp }) {
     // console.log(participant)
     return (
         <tr className=" border border-b-slate-200 odd:bg-white even:bg-gray-50">
-            <td className="Student_Name p-3 uppercase">{participant["student_name"]}
+            <td className="Student_Name p-3 uppercase whitespace-nowrap text-sm font-medium">
                 {participant["total_completions_of_both_pathways"] === "Yes" ? '🏅' : ''}
+                {maxCourseComp[0] === participant["of_courses_completed"] ? <span className="text-lg"> 🥇 </span> : ''}
+                {maxCourseComp[1] === participant["of_courses_completed"] ? <span className="text-lg"> 🥈 </span> : ''}
+                {maxCourseComp[2] === participant["of_courses_completed"] ? <span className="text-lg"> &#129353; </span> : ''}
+                {participant["student_name"]}
             </td>
 
             {/* <td className="Student_Email p-3">{participant["Student Email"]}</td> */}

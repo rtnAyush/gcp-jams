@@ -5,18 +5,22 @@ import TableBody from './TableBody'
 const TableIndex = () => {
 
   const [participationData, setParticipationdata] = useState([]);
+  const [randomJoke, setRandomJoke] = useState(null);
   const [loading, setLoading] = useState(false);
   const [EligibleforSwags, setEligibleforSwags] = useState(0);
   const [searchByName, setSearchByName] = useState('');
+
+  const [maxCourseComp, setMaxCourseComp] = useState([]);
 
   useEffect(() => {
     getStudentData();
     // eslint-disable-next-line
   }, [searchByName])
 
-  // useEffect(() => {
-  //   searchName(searchByName);
-  // }, [searchByName])
+  useEffect(() => {
+    getJoke();
+    // eslint-disable-next-line
+  }, [])
 
 
 
@@ -42,41 +46,64 @@ const TableIndex = () => {
 
   const calculateTotalEligibility = (data) => {
     let total = 0;
+    let countMap = {};
+    let keys;
     data.forEach((ele) => {
       ele["total_completions_of_both_pathways"] === "Yes" && total++;
+
+
+      const count = ele['of_courses_completed'];
+      countMap[count] = countMap[count] ? countMap[count] + 1 : 1;
+      keys = Object.keys(countMap).map(Number);
+      keys.sort((a, b) => b - a);
     })
+    setMaxCourseComp(keys);
     setEligibleforSwags(total)
   }
 
-  const searchName = (name) => {
-    const newArr = participationData?.filter(({ student_name }) => student_name?.toLowerCase() === name?.toLowerCase());
-    // for (let i = 0; i < participationData?.length; i++) {
-    //   let participant = participationData[i]["student_name"].toLowerCase();
-    //   let match = participant.includes(name.toLowerCase());
-    //   if (match) newArr.push(participationData[i]);
-
-    // }
-    // console.log(newArr);
-    setParticipationdata(newArr);
+  const getJoke = async () => {
+    try {
+      const res = await fetch('https://v2.jokeapi.dev/joke/Programming?type=twopart');
+      if (!res.ok) {
+        throw new Error(`Request failed with status: ${res.status}`);
+      }
+      const data = await res.json();
+      setRandomJoke(data);
+    } catch (error) {
+      console.log(error);
+    }
   }
+
 
   return (
     <div className='w-full relative px-3'>
 
 
 
-      <div className="sec m-auto my-10 space-y-8 w-1/2 mob:w-full flex flex-col">
+      <div className="sec m-auto my-10 space-y-8 md:w-1/2 flex flex-col">
         <div className="message bg-yellow-100 text-yellow-700 p-5 rounded-lg shadow-lg shadow-yellow-300/30 text-center border border-yellow-300/30"><p className="text-center">-: Jokes :-</p>
-          <p><span className="text-black">Someone :</span> How did you fall in poverty ? gamble or drugs ?</p>
-          <p><span className="text-black">Me :</span> I left an Ec2 Instance on... !🥲</p>
+          <p><span className="text-black">Someone : </span>
+            {
+              randomJoke ?
+                randomJoke?.setup :
+                "How did you fall in poverty ? gamble or drugs ?"
+            }
+          </p>
+          <p><span className="text-black">Me : </span>
+            {
+              randomJoke ?
+                randomJoke?.delivery :
+                "I left an Ec2 Instance on... !🥲"
+            }
+          </p>
         </div>
 
-        <div className="info flex mob:flex-col mob:justify-center mob:items-center mob:space-y-10 mob:p-5 justify-evenly space-x-3 mob:space-x-0">
-          <div className="eligibleforswag w-fit mob:w-full h-20 p-5 space-x-5 rounded-lg flex flex-row justify-evenly mob:justify-between items-center bg-green-50 shadow-lg shadow-green-300/30 border border-green-200">
+        <div className="info grid gap-3 sm:flex sm:justify-center sm:items-center mob:p-5 justify-evenly mob:space-x-0">
+          <div className="eligibleforswag space-x-5 flex-1 w-full p-5 rounded-lg flex flex-row justify-evenly mob:justify-between items-center bg-green-50 shadow-lg shadow-green-300/30 border border-green-200">
             <p className="text-center mob:text-start text-sm text-green-400">No of Eligible <br /> Participants for swags</p>
             <p className="no text-2xl border-l-2 border-l-green-700 pl-3 text-green-800">{EligibleforSwags}</p>
           </div>
-          <div className="eligibleforswag w-fit mob:w-full h-20 p-5 space-x-5 rounded-lg flex flex-row justify-evenly mob:justify-between items-center bg-blue-50 shadow-lg shadow-blue-300/30 border border-blue-200">
+          <div className="flex-1 w-full p-5 space-x-5 rounded-lg flex flex-row justify-evenly mob:justify-between items-center bg-blue-50 shadow-lg shadow-blue-300/30 border border-blue-200">
             <p className="text-center mob:text-start text-sm text-blue-400">Total No of <br />Participants</p>
             <p className="no text-2xl border-l-2 border-l-blue-700 pl-3 text-blue-800">{participationData?.length}</p>
           </div>
@@ -94,58 +121,59 @@ const TableIndex = () => {
         </div>
       </div>
 
+      <div class='overflow-x-auto mx-auto'>
+        <table className='table-auto sm:table-fixed mx-auto m-5'>
+          <thead className='shadow-md text-sm bg-blue-500 text-gray-200 sticky top-2 z-10'>
+            <tr className='text-center '>
+              <td className="rounded-ss-lg w-80 p-2 border-r-2 border-r-gray-300">Name</td>
+              {/* <td className="p-2 border-r-2 border-r-gray-300">Email</td> */}
+              <td className="p-2 border-r-2 border-r-gray-300 whitespace-nowrap">Redemption Status</td>
+              <td className="mob:hidden p-2 px-10 border-r-2 border-r-gray-300">Institution</td>
+              <td className="mob:rounded-se-lg p-2 border-r-2 border-r-gray-300 max-w-[150px]">Completions of both Pathways</td>
+              <td className="mob:hidden p-2 border-r-2 border-r-gray-300 max-w-[150px]">No Courses Completed</td>
+              <td className="mob:hidden p-2 border-r-2 border-r-gray-300 max-w-[150px]">No Skill Badges Completed</td>
+              <td className="mob:hidden rounded-se-lg p-2 max-w-[150px]">GenAI Game Completed</td>
+              {/* <td className="p-2 border-r-2 border-r-gray-300">Enroll Date & Time</td> */}
+              {/* <td className="p-2 border-r-2 border-r-gray-300">Enroll. Status</td> */}
+              {/* <td className='p-2 border-r-2 border-r-gray-300'>Profile URL</td> */}
+            </tr>
+          </thead>
+          {
+            !loading ?
+              <TableBody
+                participationData={participationData}
+                setParticipationdata={setParticipationdata}
+                maxCourseComp={maxCourseComp}
+              /> :
+              Array(10).fill(0).map((_, idx) =>
+                <tr key={idx} className="animate-pulse border border-b-slate-200 odd:bg-white even:bg-gray-50">
+                  <td className="p-4">
+                    <span className='block h-4 bg-slate-300 rounded' />
+                  </td>
+                  <td className="p-4">
+                    <span className='block h-4 bg-slate-300 rounded' />
+                  </td>
+                  <td className="p-4">
+                    <span className='block h-4 bg-slate-300 rounded' />
+                  </td>
+                  <td className="p-4">
+                    <span className='block h-4 bg-slate-300 rounded' />
+                  </td>
+                  <td className="p-4">
+                    <span className='block h-4 bg-slate-300 rounded' />
+                  </td>
+                  <td className="p-4">
+                    <span className='block h-4 bg-slate-300 rounded' />
+                  </td>
+                  <td className="p-4">
+                    <span className='block h-4 bg-slate-300 rounded' />
+                  </td>
+                </tr>
+              )
 
-      <table className='mx-auto table-fixed m-5  '>
-        <thead className='shadow-md text-sm bg-blue-500 text-gray-200 sticky top-2 z-10'>
-          <tr className='text-center '>
-            <td className="rounded-ss-lg w-80 p-2 border-r-2 border-r-gray-300">Name</td>
-            {/* <td className="p-2 border-r-2 border-r-gray-300">Email</td> */}
-            <td className="p-2 border-r-2 border-r-gray-300">Redemption Status</td>
-            <td className="mob:hidden p-2 px-10 border-r-2 border-r-gray-300">Institution</td>
-            <td className="mob:rounded-se-lg p-2 border-r-2 border-r-gray-300 max-w-[150px]">Completions of both Pathways</td>
-            <td className="mob:hidden p-2 border-r-2 border-r-gray-300 max-w-[150px]">No Courses Completed</td>
-            <td className="mob:hidden p-2 border-r-2 border-r-gray-300 max-w-[150px]">No Skill Badges Completed</td>
-            <td className="mob:hidden rounded-se-lg p-2 max-w-[150px]">GenAI Game Completed</td>
-            {/* <td className="p-2 border-r-2 border-r-gray-300">Enroll Date & Time</td> */}
-            {/* <td className="p-2 border-r-2 border-r-gray-300">Enroll. Status</td> */}
-            {/* <td className='p-2 border-r-2 border-r-gray-300'>Profile URL</td> */}
-          </tr>
-        </thead>
-        {
-          !loading ?
-            <TableBody
-              participationData={participationData}
-              setParticipationdata={setParticipationdata}
-            /> :
-            Array(10).fill(0).map((_, idx) =>
-              <tr key={idx} className="animate-pulse border border-b-slate-200 odd:bg-white even:bg-gray-50">
-                <td className="p-4">
-                  <span className='block h-4 bg-slate-300 rounded' />
-                </td>
-                <td className="p-4">
-                  <span className='block h-4 bg-slate-300 rounded' />
-                </td>
-                <td className="p-4">
-                  <span className='block h-4 bg-slate-300 rounded' />
-                </td>
-                <td className="p-4">
-                  <span className='block h-4 bg-slate-300 rounded' />
-                </td>
-                <td className="p-4">
-                  <span className='block h-4 bg-slate-300 rounded' />
-                </td>
-                <td className="p-4">
-                  <span className='block h-4 bg-slate-300 rounded' />
-                </td>
-                <td className="p-4">
-                  <span className='block h-4 bg-slate-300 rounded' />
-                </td>
-              </tr>
-            )
-
-        }
-      </table>
-
+          }
+        </table>
+      </div>
     </div>
   )
 }
