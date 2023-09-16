@@ -5,29 +5,38 @@ import TableBody from './TableBody'
 const TableIndex = () => {
 
   const [participationData, setParticipationdata] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [EligibleforSwags, setEligibleforSwags] = useState(0);
+  const [searchByName, setSearchByName] = useState('');
 
   useEffect(() => {
     getStudentData();
     // eslint-disable-next-line
-  }, [])
+  }, [searchByName])
+
+  // useEffect(() => {
+  //   searchName(searchByName);
+  // }, [searchByName])
 
 
 
   const getStudentData = async () => {
     try {
-      // console.log(process.env.REACT_APP_BACKEND_URL);
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/student-data/get-student-data`);
+      setLoading(true);
+
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/student-data/get-student-data?student_name=${searchByName}`);
       if (!response.ok) {
         throw new Error(`Request failed with status: ${response.status}`);
       }
       const data = await response.json();
-      console.log(data);
+      // console.log(data);
       setParticipationdata(data?.foundData);
       calculateTotalEligibility(data?.foundData)
 
     } catch (error) {
       console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -39,14 +48,14 @@ const TableIndex = () => {
     setEligibleforSwags(total)
   }
 
-  const searchname = (name) => {
-    const newArr = [];
-    for (let i = 0; i < participationData?.length; i++) {
-      let participant = participationData[i]["student_name"].toLowerCase();
-      let match = participant.includes(name.toLowerCase());
-      if (match) newArr.push(participationData[i]);
+  const searchName = (name) => {
+    const newArr = participationData?.filter(({ student_name }) => student_name?.toLowerCase() === name?.toLowerCase());
+    // for (let i = 0; i < participationData?.length; i++) {
+    //   let participant = participationData[i]["student_name"].toLowerCase();
+    //   let match = participant.includes(name.toLowerCase());
+    //   if (match) newArr.push(participationData[i]);
 
-    }
+    // }
     // console.log(newArr);
     setParticipationdata(newArr);
   }
@@ -73,12 +82,12 @@ const TableIndex = () => {
           </div>
         </div>
 
-        <div className="search m-auto mt-3 mob:py-3 py-2  space-x-5  flex justify-start items-center shadow-lg shadow-blue-400/30 bg-blue-50 w-full rounded-full">
+        <div className="searchByName m-auto mt-3 mob:py-3 py-2  space-x-5  flex justify-start items-center shadow-lg shadow-blue-400/30 bg-blue-50 w-full rounded-full">
           <div className="icon px-3 "><svg xmlns="http://www.w3.org/2000/svg" className='h-5' viewBox="0 0 512 512"><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z" fill="#3b82f6" /></svg></div>
           <div className="input w-full">
             <input
               onChange={(e) => {
-                searchname(e.target.value)
+                setSearchByName(e.target.value)
               }}
               className='bg-transparent mob:text-lg text-base outline-none w-full' type="text" name="searchbar" id="searchbar" placeholder='Search Your Name Here' />
           </div>
@@ -102,10 +111,39 @@ const TableIndex = () => {
             {/* <td className='p-2 border-r-2 border-r-gray-300'>Profile URL</td> */}
           </tr>
         </thead>
-        <TableBody
-          participationData={participationData}
-          setParticipationdata={setParticipationdata}
-        />
+        {
+          !loading ?
+            <TableBody
+              participationData={participationData}
+              setParticipationdata={setParticipationdata}
+            /> :
+            Array(10).fill(0).map((_, idx) =>
+              <tr key={idx} className="animate-pulse border border-b-slate-200 odd:bg-white even:bg-gray-50">
+                <td className="p-4">
+                  <span className='block h-4 bg-slate-300 rounded' />
+                </td>
+                <td className="p-4">
+                  <span className='block h-4 bg-slate-300 rounded' />
+                </td>
+                <td className="p-4">
+                  <span className='block h-4 bg-slate-300 rounded' />
+                </td>
+                <td className="p-4">
+                  <span className='block h-4 bg-slate-300 rounded' />
+                </td>
+                <td className="p-4">
+                  <span className='block h-4 bg-slate-300 rounded' />
+                </td>
+                <td className="p-4">
+                  <span className='block h-4 bg-slate-300 rounded' />
+                </td>
+                <td className="p-4">
+                  <span className='block h-4 bg-slate-300 rounded' />
+                </td>
+              </tr>
+            )
+
+        }
       </table>
 
     </div>
