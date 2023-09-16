@@ -1,0 +1,20 @@
+{
+  "short_name": "GCP-JAMS",
+  "name": "A website to see GCP-JAMS",
+  "icons": [
+    {
+      "src": "/asserts/gdscfavi.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/asserts/gdsc-logo.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
