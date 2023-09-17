@@ -9,8 +9,9 @@ const TableIndex = () => {
   const [loading, setLoading] = useState(false);
   const [EligibleforSwags, setEligibleforSwags] = useState(0);
   const [searchByName, setSearchByName] = useState('');
+  const [total, setTotal] = useState(0);
 
-  const [maxCourseComp, setMaxCourseComp] = useState([]);
+
 
   useEffect(() => {
     getStudentData();
@@ -35,6 +36,7 @@ const TableIndex = () => {
       const data = await response.json();
       // console.log(data);
       setParticipationdata(data?.foundData);
+      setTotal(data?.total);
       calculateTotalEligibility(data?.foundData)
 
     } catch (error) {
@@ -46,20 +48,12 @@ const TableIndex = () => {
 
   const calculateTotalEligibility = (data) => {
     let total = 0;
-    let countMap = {};
-    let keys;
     data.forEach((ele) => {
       ele["total_completions_of_both_pathways"] === "Yes" && total++;
-
-
-      const count = ele['of_courses_completed'];
-      countMap[count] = countMap[count] ? countMap[count] + 1 : 1;
-      keys = Object.keys(countMap).map(Number);
-      keys.sort((a, b) => b - a);
     })
-    setMaxCourseComp(keys);
     setEligibleforSwags(total)
   }
+
 
   const getJoke = async () => {
     try {
@@ -105,7 +99,7 @@ const TableIndex = () => {
           </div>
           <div className="flex-1 w-full p-5 space-x-5 rounded-lg flex flex-row justify-evenly mob:justify-between items-center bg-blue-50 shadow-lg shadow-blue-300/30 border border-blue-200">
             <p className="text-center mob:text-start text-sm text-blue-400">Total No of <br />Participants</p>
-            <p className="no text-2xl border-l-2 border-l-blue-700 pl-3 text-blue-800">{participationData?.length}</p>
+            <p className="no text-2xl border-l-2 border-l-blue-700 pl-3 text-blue-800">{total}</p>
           </div>
         </div>
 
@@ -121,7 +115,7 @@ const TableIndex = () => {
         </div>
       </div>
 
-      <div class='overflow-x-auto mx-auto'>
+      <div className='overflow-x-auto mx-auto'>
         <table className='table-auto sm:table-fixed mx-auto m-5'>
           <thead className='shadow-md text-sm bg-blue-500 text-gray-200 sticky top-2 z-10'>
             <tr className='text-center '>
@@ -143,34 +137,35 @@ const TableIndex = () => {
               <TableBody
                 participationData={participationData}
                 setParticipationdata={setParticipationdata}
-                maxCourseComp={maxCourseComp}
+                searchByName={searchByName}
               /> :
-              Array(10).fill(0).map((_, idx) =>
-                <tr key={idx} className="animate-pulse border border-b-slate-200 odd:bg-white even:bg-gray-50">
-                  <td className="p-4">
-                    <span className='block h-4 bg-slate-300 rounded' />
-                  </td>
-                  <td className="p-4">
-                    <span className='block h-4 bg-slate-300 rounded' />
-                  </td>
-                  <td className="p-4">
-                    <span className='block h-4 bg-slate-300 rounded' />
-                  </td>
-                  <td className="p-4">
-                    <span className='block h-4 bg-slate-300 rounded' />
-                  </td>
-                  <td className="p-4">
-                    <span className='block h-4 bg-slate-300 rounded' />
-                  </td>
-                  <td className="p-4">
-                    <span className='block h-4 bg-slate-300 rounded' />
-                  </td>
-                  <td className="p-4">
-                    <span className='block h-4 bg-slate-300 rounded' />
-                  </td>
-                </tr>
-              )
-
+              <tbody>
+                {Array(10).fill(0).map((_, idx) =>
+                  <tr key={idx} className="animate-pulse border border-b-slate-200 odd:bg-white even:bg-gray-50">
+                    <td className="p-4">
+                      <span className='block h-4 bg-slate-300 rounded' />
+                    </td>
+                    <td className="p-4">
+                      <span className='block h-4 bg-slate-300 rounded' />
+                    </td>
+                    <td className="p-4">
+                      <span className='block h-4 bg-slate-300 rounded' />
+                    </td>
+                    <td className="p-4">
+                      <span className='block h-4 bg-slate-300 rounded' />
+                    </td>
+                    <td className="p-4">
+                      <span className='block h-4 bg-slate-300 rounded' />
+                    </td>
+                    <td className="p-4">
+                      <span className='block h-4 bg-slate-300 rounded' />
+                    </td>
+                    <td className="p-4">
+                      <span className='block h-4 bg-slate-300 rounded' />
+                    </td>
+                  </tr>
+                )}
+              </tbody>
           }
         </table>
       </div>

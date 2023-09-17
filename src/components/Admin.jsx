@@ -91,7 +91,7 @@ const Admin = () => {
                             Processing...
                         </button>
                         :
-                        <button className='border bg-blue-600 rounded-md p-2 cursor-pointer hover:bg-blue-500' >Submit</button>
+                        <button className='border bg-blue-600 text-white rounded-md p-2 cursor-pointer hover:bg-blue-500' >Submit</button>
                 }
             </form>
         </main>
