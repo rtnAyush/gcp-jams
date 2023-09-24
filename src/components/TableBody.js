@@ -15,15 +15,19 @@ function TableBody({ participationData, searchByName }) {
 
     const calculateRanking = (data) => {
 
-        let countMap = {};
-        let keys;
+        const sums = [];
         data.forEach((ele) => {
-            const count = ele['of_courses_completed'];
-            countMap[count] = countMap[count] ? countMap[count] + 1 : 1;
-            keys = Object.keys(countMap).map(Number);
-            keys.sort((a, b) => b - a);
-        })
-        setMaxCourseComp(keys);
+            const sum = ele['of_courses_completed'] + ele['of_skill_badges_completed'] + ele['of_gen_ai_game_completed'];
+            if (!sums.includes(sum)) {
+                sums.push(sum);
+            }
+        });
+
+        sums.sort((a, b) => b - a);
+
+        const top3Sums = sums.slice(0, 3);
+        // console.log(top3Sums);
+        setMaxCourseComp(top3Sums);
     }
 
     return (

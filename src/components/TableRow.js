@@ -6,9 +6,9 @@ function TableRow({ participant, maxCourseComp }) {
         <tr className=" border border-b-slate-200 odd:bg-white even:bg-gray-50">
             <td className="Student_Name p-3 uppercase whitespace-nowrap text-sm font-medium">
                 {participant["total_completions_of_both_pathways"] === "Yes" ? '🏅' : ''}
-                {maxCourseComp[0] === participant["of_courses_completed"] ? <span className="text-lg"> 🥇 </span> : ''}
-                {maxCourseComp[1] === participant["of_courses_completed"] ? <span className="text-lg"> 🥈 </span> : ''}
-                {maxCourseComp[2] === participant["of_courses_completed"] ? <span className="text-lg"> &#129353; </span> : ''}
+                {maxCourseComp[0] === (participant['of_courses_completed'] + participant['of_skill_badges_completed'] + participant['of_gen_ai_game_completed']) ? <span className="text-lg"> 🥇 </span> : ''}
+                {maxCourseComp[1] === (participant['of_courses_completed'] + participant['of_skill_badges_completed'] + participant['of_gen_ai_game_completed']) ? <span className="text-lg"> 🥈 </span> : ''}
+                {maxCourseComp[2] === (participant['of_courses_completed'] + participant['of_skill_badges_completed'] + participant['of_gen_ai_game_completed']) ? <span className="text-lg"> &#129353; </span> : ''}
                 {participant["student_name"]}
             </td>
 
